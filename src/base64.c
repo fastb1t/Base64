@@ -19,7 +19,7 @@ int is_base64_string(const char *str, const unsigned int len)
     {
         return 0;
     }
-
+    
     char *p = (char *)str;
     while (p - str < len)
     {

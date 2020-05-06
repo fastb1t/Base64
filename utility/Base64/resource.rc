@@ -1,0 +1,10 @@
+#include "resource.h"
+
+#include <windows.h>
+
+IDI_ICON1 ICON "res\\icon.ico"
+
+IDB_ARROW_LEFT BITMAP "res\\arrow_left.bmp"
+IDB_ARROW_RIGHT BITMAP "res\\arrow_right.bmp"
+
+1 RT_MANIFEST "res\\manifest.xml"
