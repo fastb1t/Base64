@@ -8,4 +8,4 @@
 
 ## Добавлена утилита для работы с алгоритмом - Base64 Encode/Decode Utility
 
-![ScreenShot](./utility.png)
+![ScreenShot](./utility/utility.png)
