@@ -2,7 +2,7 @@
 
 #include <string.h>
 
-static const char base64[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+static const char g_base64[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
 int is_base64_char(const char c)
 {
@@ -10,7 +10,7 @@ int is_base64_char(const char c)
     {
         return 0;
     }
-    return strchr(base64, c) != NULL || c == '=';
+    return strchr(g_base64, c) != NULL || c == '=';
 }
 
 int is_base64_string(const char *str, const unsigned int len)
@@ -19,7 +19,7 @@ int is_base64_string(const char *str, const unsigned int len)
     {
         return 0;
     }
-    
+
     char *p = (char *)str;
     while (p - str < len)
     {
@@ -62,10 +62,10 @@ int base64_encode(const unsigned char *bytes, const unsigned int len, char *out)
         from[2] = (i1 + 2) < len ? bytes[i1 + 2] : 0;
         i1 += 3;
 
-        to[0] = base64[from[0] >> 2];
-        to[1] = base64[((from[0] & 0x03) << 4) | (from[1] >> 4)];
-        to[2] = base64[((from[1] & 0x0F) << 2) | (from[2] >> 6)];
-        to[3] = base64[from[2] & 0x3F];
+        to[0] = g_base64[from[0] >> 2];
+        to[1] = g_base64[((from[0] & 0x03) << 4) | (from[1] >> 4)];
+        to[2] = g_base64[((from[1] & 0x0F) << 2) | (from[2] >> 6)];
+        to[3] = g_base64[from[2] & 0x3F];
 
         memcpy(&out[i2], to, 4);
         i2 += 4;
@@ -79,6 +79,7 @@ int base64_encode(const unsigned char *bytes, const unsigned int len, char *out)
     case 1:
         out[new_len - 1] = '=';
     }
+
     return new_len;
 }
 
@@ -114,8 +115,8 @@ int base64_decode(const char *str, const unsigned int len, unsigned char *out)
 
         for (j = 0; j < 4; j++)
         {
-            p = strchr(base64, from[j]);
-            from[j] = !p ? '\0' : (p - base64);
+            p = strchr(g_base64, from[j]);
+            from[j] = !p ? '\0' : (p - g_base64);
         }
 
         to[0] = (from[0] << 2) | (from[1] >> 4);

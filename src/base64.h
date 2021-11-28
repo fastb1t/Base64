@@ -1,5 +1,5 @@
-#ifndef BASE64_H_INCLUDED
-#define BASE64_H_INCLUDED
+#ifndef _BASE64_H_
+#define _BASE64_H_
 
 /*
 Return value:
@@ -7,7 +7,7 @@ Return value:
     1 - Is Base64.
 */
 int is_base64_char(
-    const char c // Character to check.
+    const char c // Character for check.
 );
 
 /*

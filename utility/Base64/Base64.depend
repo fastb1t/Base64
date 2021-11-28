@@ -1,20 +1,19 @@
 # depslib dependency file v1.0
-1586595764 source:e:\projects\base64\src\base64.c
+1590917767 source:e:\projects\base64\src\base64.c
 	"Base64.h"
 	<string.h>
 
-1581018085 e:\projects\base64\src\base64.h
+1590917437 e:\projects\base64\src\base64.h
 
-1588769150 source:e:\projects\base64\utility\base64\main.c
-	<tchar.h>
+1590919100 source:e:\projects\base64\utility\base64\main.c
 	<windows.h>
 	<windowsx.h>
 	"resource.h"
 	"../../src/base64.h"
 
-1588769049 source:e:\projects\base64\utility\base64\resource.rc
+1588765449 source:e:\projects\base64\utility\base64\resource.rc
 	"resource.h"
 	<windows.h>
 
-1588769049 e:\projects\base64\utility\base64\resource.h
+1588765449 e:\projects\base64\utility\base64\resource.h
 

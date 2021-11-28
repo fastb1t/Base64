@@ -1,4 +1,3 @@
-#include <tchar.h>
 #include <windows.h>
 #include <windowsx.h>
 
@@ -24,16 +23,16 @@ static HFONT g_hTitleFont = NULL;
 static HFONT g_hDefaultFont = NULL;
 
 
-// [_tWinMain]: entry point.
-int WINAPI _tWinMain(
+// [WinMain]: entry point.
+int WINAPI WinMain(
     HINSTANCE hInstance,
     HINSTANCE hPrevInstance,
-    TCHAR* lpCmdLine,
+    LPSTR lpCmdLine,
     int nShowCmd
 )
 {
-    const TCHAR szWindowName[] = _T("Base64 Encode/Decode Utility");
-    const TCHAR szClassName[] = _T("__base__class__");
+    const char szWindowName[] = "Base64 Encode/Decode Utility";
+    const char szClassName[] = "__base__class__";
 
     DWORD dwStyle = WS_OVERLAPPEDWINDOW;
     DWORD dwExStyle = WS_EX_APPWINDOW;
@@ -65,7 +64,7 @@ int WINAPI _tWinMain(
 
     if (!RegisterClassEx(&wcex))
     {
-        MessageBox(NULL, _T("Window Registration Failed."), _T("Error!"), MB_OK | MB_ICONERROR | MB_TOPMOST);
+        MessageBox(NULL, "Window Registration Failed.", "Error!", MB_OK | MB_ICONERROR | MB_TOPMOST);
         return 1;
     }
 
@@ -85,7 +84,7 @@ int WINAPI _tWinMain(
 
     if (!hWnd)
     {
-        MessageBox(NULL, _T("Window Creation Failed."), _T("Error!"), MB_OK | MB_ICONERROR | MB_TOPMOST);
+        MessageBox(NULL, "Window Creation Failed.", "Error!", MB_OK | MB_ICONERROR | MB_TOPMOST);
         UnregisterClass(szClassName, hInstance);
         return 1;
     }
@@ -111,7 +110,7 @@ int WINAPI _tWinMain(
     UnregisterClass(szClassName, hInstance);
     return (int)msg.wParam;
 }
-// [/_tWinMain]
+// [/WinMain]
 
 
 // [WindowProcedure]:
@@ -140,29 +139,29 @@ static BOOL OnCreate(HWND hWnd, LPCREATESTRUCT lpcs)
     g_hBackgroundBrush = CreateSolidBrush(RGB(210, 220, 220));
 
     g_hTitleFont = CreateFont(16, 0, 0, 0, FW_BOLD, FALSE, FALSE, FALSE, DEFAULT_CHARSET,
-        OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH, _T("Arial"));
+        OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH, "Arial");
 
     g_hDefaultFont = CreateFont(15, 0, 0, 0, FW_NORMAL, FALSE, FALSE, FALSE, DEFAULT_CHARSET,
-        OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH, _T("Arial"));
+        OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH, "Arial");
 
-    CreateWindowEx(0, _T("edit"), _T(""),
+    CreateWindowEx(0, "edit", "",
         WS_CHILD | WS_VISIBLE | WS_BORDER | WS_HSCROLL | WS_VSCROLL |
         ES_LEFT | ES_AUTOVSCROLL | ES_AUTOHSCROLL | ES_MULTILINE | ES_WANTRETURN,
         0, 0, 0, 0, hWnd, (HMENU)IDC_TEXT, lpcs->hInstance, NULL);
     SendMessage(GetDlgItem(hWnd, IDC_TEXT), WM_SETFONT, (WPARAM)g_hDefaultFont, 0L);
 
-    CreateWindowEx(0, _T("edit"), _T(""),
+    CreateWindowEx(0, "edit", "",
         WS_CHILD | WS_VISIBLE | WS_BORDER | WS_HSCROLL | WS_VSCROLL |
         ES_LEFT | ES_AUTOVSCROLL | ES_AUTOHSCROLL | ES_MULTILINE | ES_WANTRETURN,
         0, 0, 0, 0, hWnd, (HMENU)IDC_BASE64, lpcs->hInstance, NULL);
     SendMessage(GetDlgItem(hWnd, IDC_BASE64), WM_SETFONT, (WPARAM)g_hDefaultFont, 0L);
 
-    CreateWindowEx(0, _T("button"), _T(""), WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON | BS_BITMAP,
+    CreateWindowEx(0, "button", "", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON | BS_BITMAP,
         0, 0, 0, 0, hWnd, (HMENU)IDC_TEXT_TO_BASE64, lpcs->hInstance, NULL);
     SendMessage(GetDlgItem(hWnd, IDC_TEXT_TO_BASE64), BM_SETIMAGE, (WPARAM)IMAGE_BITMAP,
         (LPARAM)LoadBitmap(lpcs->hInstance, MAKEINTRESOURCE(IDB_ARROW_RIGHT)));
 
-    CreateWindowEx(0, _T("button"), _T(""), WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON | BS_BITMAP,
+    CreateWindowEx(0, "button", "", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON | BS_BITMAP,
         0, 0, 0, 0, hWnd, (HMENU)IDC_BASE64_TO_TEXT, lpcs->hInstance, NULL);
     SendMessage(GetDlgItem(hWnd, IDC_BASE64_TO_TEXT), BM_SETIMAGE, (WPARAM)IMAGE_BITMAP,
         (LPARAM)LoadBitmap(lpcs->hInstance, MAKEINTRESOURCE(IDB_ARROW_LEFT)));
@@ -179,13 +178,85 @@ static void OnCommand(HWND hWnd, int id, HWND hWndCtl, UINT codeNotify)
     {
     case IDC_TEXT_TO_BASE64:
     {
+        SetWindowText(GetDlgItem(hWnd, IDC_BASE64), "\0");
 
+        int iTextLength = GetWindowTextLength(GetDlgItem(hWnd, IDC_TEXT));
+        if (iTextLength > 0)
+        {
+            char* szBuff = (char*)malloc(iTextLength + 2);
+            if (szBuff)
+            {
+                memset(szBuff, 0, iTextLength + 2);
+                if (GetWindowText(GetDlgItem(hWnd, IDC_TEXT), szBuff, iTextLength + 1) > 0)
+                {
+                    int iBase64Length = base64_encode((unsigned char*)szBuff, iTextLength, NULL);
+                    if (iBase64Length > 0)
+                    {
+                        char* szOutBuff = (char*)malloc(iBase64Length + 2);
+                        if (szOutBuff)
+                        {
+                            memset(szOutBuff, 0, iBase64Length + 2);
+                            if (base64_encode((unsigned char*)szBuff, iTextLength, szOutBuff) > 0)
+                            {
+                                SetWindowText(GetDlgItem(hWnd, IDC_BASE64), szOutBuff);
+                            }
+                            free(szOutBuff);
+                        }
+                        else
+                        {
+                            MessageBox(hWnd, "Failed to allocate memory.", "Error", MB_OK | MB_ICONERROR);
+                        }
+                    }
+                }
+                free(szBuff);
+            }
+            else
+            {
+                MessageBox(hWnd, "Failed to allocate memory.", "Error", MB_OK | MB_ICONERROR);
+            }
+        }
     }
     break;
 
     case IDC_BASE64_TO_TEXT:
     {
+        SetWindowText(GetDlgItem(hWnd, IDC_TEXT), "\0");
 
+        int iTextLength = GetWindowTextLength(GetDlgItem(hWnd, IDC_BASE64));
+        if (iTextLength > 0)
+        {
+            char* szBuff = (char*)malloc(iTextLength + 2);
+            if (szBuff)
+            {
+                memset(szBuff, 0, iTextLength + 2);
+                if (GetWindowText(GetDlgItem(hWnd, IDC_BASE64), szBuff, iTextLength + 1) > 0)
+                {
+                    int iBase64Length = base64_decode(szBuff, iTextLength, NULL);
+                    if (iBase64Length > 0)
+                    {
+                        char* szOutBuff = (char*)malloc(iBase64Length + 2);
+                        if (szOutBuff)
+                        {
+                            memset(szOutBuff, 0, iBase64Length + 2);
+                            if (base64_decode(szBuff, iTextLength, (unsigned char*)szOutBuff) > 0)
+                            {
+                                SetWindowText(GetDlgItem(hWnd, IDC_TEXT), szOutBuff);
+                            }
+                            free(szOutBuff);
+                        }
+                        else
+                        {
+                            MessageBox(hWnd, "Failed to allocate memory.", "Error", MB_OK | MB_ICONERROR);
+                        }
+                    }
+                }
+                free(szBuff);
+            }
+            else
+            {
+                MessageBox(hWnd, "Failed to allocate memory.", "Error", MB_OK | MB_ICONERROR);
+            }
+        }
     }
     break;
     }
@@ -211,15 +282,22 @@ static void OnPaint(HWND hWnd)
     int iOldBkMode = SetBkMode(hMemDC, TRANSPARENT);
     HFONT hOldFont = (HFONT)GetCurrentObject(hMemDC, OBJ_FONT);
 
-    TCHAR szText[128] = { 0 };
+    char szText[128] = { 0 };
+    SIZE size;
 
     SelectObject(hMemDC, g_hTitleFont);
 
-    lstrcpy(szText, _T("Text"));
+    lstrcpy(szText, "Text");
     TextOut(hMemDC, 10, 10, szText, lstrlen(szText));
 
-    lstrcpy(szText, _T("Base64"));
+    lstrcpy(szText, "Base64");
     TextOut(hMemDC, iWindowWidth / 2 + 40, 10, szText, lstrlen(szText));
+
+    SelectObject(hMemDC, g_hDefaultFont);
+
+    lstrcpy(szText, "Copyright \251 2021 fastb1t");
+    GetTextExtentPoint32(hMemDC, szText, lstrlen(szText), &size);
+    TextOut(hMemDC, iWindowWidth - 10 - size.cx, iWindowHeight - 10 - size.cy, szText, lstrlen(szText));
 
     SelectObject(hMemDC, hOldFont);
     SetBkMode(hMemDC, iOldBkMode);
@@ -245,8 +323,8 @@ static void OnGetMinMaxInfo(HWND hWnd, LPMINMAXINFO lpmmi)
 // [OnSize]: WM_SIZE
 static void OnSize(HWND hWnd, UINT state, int cx, int cy)
 {
-    MoveWindow(GetDlgItem(hWnd, IDC_TEXT), 10, 30, cx / 2 - 50, cy - 40, TRUE);
-    MoveWindow(GetDlgItem(hWnd, IDC_BASE64), cx / 2 + 40, 30, cx / 2 - 50, cy - 40, TRUE);
+    MoveWindow(GetDlgItem(hWnd, IDC_TEXT), 10, 30, cx / 2 - 50, cy - 70, TRUE);
+    MoveWindow(GetDlgItem(hWnd, IDC_BASE64), cx / 2 + 40, 30, cx / 2 - 50, cy - 70, TRUE);
     MoveWindow(GetDlgItem(hWnd, IDC_TEXT_TO_BASE64), cx / 2 - 19, cy / 2 - 33, 38, 28, TRUE);
     MoveWindow(GetDlgItem(hWnd, IDC_BASE64_TO_TEXT), cx / 2 - 19, cy / 2 + 5, 38, 28, TRUE);
 }
