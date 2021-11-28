@@ -39,12 +39,7 @@ int base64_encode(const unsigned char *bytes, const unsigned int len, char *out)
         return -1;
     }
 
-    int new_len = len;
-    while (new_len % 4)
-    {
-        new_len++;
-    }
-    new_len = (new_len / 3) << 2;
+    int new_len = ((4 * len / 3) + 3) & ~3;
 
     if (out == NULL)
     {
@@ -74,15 +69,18 @@ int base64_encode(const unsigned char *bytes, const unsigned int len, char *out)
     switch (((new_len >> 2) * 3) - len)
     {
     case 2:
+    {
         out[new_len - 2] = '=';
+    }
 
     case 1:
+    {
         out[new_len - 1] = '=';
+    }
     }
 
     return new_len;
 }
-
 
 int base64_decode(const char *str, const unsigned int len, unsigned char *out)
 {
@@ -124,9 +122,13 @@ int base64_decode(const char *str, const unsigned int len, unsigned char *out)
         to[2] = (from[2] << 6) | from[3];
 
         if (i2 + 3 < new_len)
+        {
             memcpy(&out[i2], to, 3);
+        }
         else
+        {
             memcpy(&out[i2], to, new_len - i2);
+        }
         i2 += 3;
     }
     return new_len;
